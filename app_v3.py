@@ -90,20 +90,19 @@ st.markdown(
         text-align: center !important;
     }
     
-    /* Premium Minimalist 3D Podium Cards */
-    [data-testid="stHorizontalBlock"] > div {
-        background: #181820 !important;
-        border-radius: 16px !important;
-        padding: 20px 16px !important;
-        border: 1px solid rgba(255, 255, 255, 0.03) !important;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45) !important;
-        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    }
-    [data-testid="stHorizontalBlock"] > div:hover {
-        transform: translateY(-5px) !important;
-        border-color: rgba(255, 24, 1, 0.2) !important;
-        box-shadow: 0 0 20px rgba(255, 24, 1, 0.2) !important;
-    }
+    /* Premium Minimalist 3D Podium Cards & Grid Rows Compressed Layout */
+[data-testid="stHorizontalBlock"] > div {
+    background: #181820 !important;
+    border-radius: 10px !important; /* Slightly sharper corner mapping */
+    padding: 8px 12px !important;    /* Reduced padding to compress row block height */
+    border: 1px solid rgba(255, 255, 255, 0.03) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35) !important;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+[data-testid="stHorizontalBlock"] > div:hover {
+    transform: translateY(-2px) !important; /* Minimal bounce elevation */
+    border-color: rgba(255, 24, 1, 0.2) !important;
+}
     
     /* Pristine Center-Aligned Driver Images */
     div[data-testid="stImage"] {
