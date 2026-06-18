@@ -429,7 +429,7 @@ with row1_cols[0]:
         left: 12px;
         bottom: 5px; /* Avatar thoda sa bahar pop-out karega premium feel ke liye */
         width: 85px;
-        height: 105px; /* Avatar ki height halki si adjust ki taaki cut na ho */
+        height: 110px; /* Avatar ki height halki si adjust ki taaki cut na ho */
         object-fit: contain;
         z-index: 10;
         filter: drop-shadow(0 8px 12px rgba(0,0,0,0.5));
