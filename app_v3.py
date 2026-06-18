@@ -171,7 +171,7 @@ TEAM_COLORS = {
     "McLaren": "#FF8000", "McLaren F1 Team": "#FF8000",
     "Red Bull Racing": "#3671C6", "Oracle Red Bull Racing": "#3671C6",
     "Alpine": "#FF87BC", "BWT Alpine F1 Team": "#FF87BC",
-    "Racing Bulls": "#66C2FF", "Visa Cash App RB F1 Team": "#66C2FF",
+    "Racing Bulls": "#66C2FF", "Visa Cash App RB F1 Team": "#66C2FF", "Visa Cash App Racing Bulls F1 Team": "#66C2FF",
     "Haas": "#B6BABD", "MoneyGram Haas F1 Team": "#B6BABD",
     "Cadillac": "#FFFFFF", "Cadillac Racing": "#FFFFFF",
     "Audi": "#F51A4A", "Kick Sauber": "#F51A4A", "Stake F1 Team Kick Sauber": "#F51A4A",
@@ -179,7 +179,7 @@ TEAM_COLORS = {
     "Williams": "#64C4FF", "Williams Racing": "#64C4FF"
 }
 
-# Explicitly added .png extensions to match the team_logos directory perfectly
+# Strict Filepath Mapping for local folder base64 embedding
 TEAM_LOGOS_MAPPING = {
     "Mercedes": "team_logos/mercedes.png", "Mercedes-AMG Petronas F1 Team": "team_logos/mercedes.png",
     "Ferrari": "team_logos/ferrari.png", "Scuderia Ferrari HP": "team_logos/ferrari.png",
@@ -187,7 +187,7 @@ TEAM_LOGOS_MAPPING = {
     "Red Bull Racing": "team_logos/redblue.png" if os.path.exists("team_logos/redblue.png") else "team_logos/redbull.png", 
     "Oracle Red Bull Racing": "team_logos/redbull.png",
     "Alpine": "team_logos/alpine.png", "BWT Alpine F1 Team": "team_logos/alpine.png",
-    "Racing Bulls": "team_logos/rb.png", "Visa Cash App RB F1 Team": "team_logos/rb.png",
+    "Racing Bulls": "team_logos/rb.png", "Visa Cash App RB F1 Team": "team_logos/rb.png", "Visa Cash App Racing Bulls F1 Team": "team_logos/rb.png",
     "Haas": "team_logos/haas.png", "MoneyGram Haas F1 Team": "team_logos/haas.png",
     "Cadillac": "team_logos/cadillac.png", "Cadillac Racing": "team_logos/cadillac.png",
     "Audi": "team_logos/audi.png", "Kick Sauber": "team_logos/audi.png",
@@ -195,18 +195,30 @@ TEAM_LOGOS_MAPPING = {
     "Williams": "team_logos/williams.png", "Williams Racing": "team_logos/williams.png"
 }
 
-def get_verified_logo_path(team_name):
+# Convert image asset cleanly to inline text base64 string to keep columns identical 
+def get_base64_logo_html(team_name, border_color):
     target_path = TEAM_LOGOS_MAPPING.get(team_name, "")
-    if os.path.exists(target_path):
-        return target_path
     
-    # Smart string lookup logic in case of space or lowercase mismatch
-    clean_key = team_name.split()[0].lower()
-    if os.path.exists("team_logos"):
-        for filename in os.listdir("team_logos"):
-            if clean_key in filename.lower() and filename.endswith(".png"):
-                return f"team_logos/{filename}"
-    return None
+    # Auto fallback scan to avoid breaking
+    if not os.path.exists(target_path):
+        clean_key = team_name.split()[0].lower()
+        if os.path.exists("team_logos"):
+            for filename in os.listdir("team_logos"):
+                if clean_key in filename.lower() and filename.endswith(".png"):
+                    target_path = f"team_logos/{filename}"
+                    break
+                    
+    if os.path.exists(target_path):
+        with open(target_path, "rb") as img_file:
+            b64_string = base64.b64encode(img_file.read()).decode()
+        return f"""
+        <div style='border-left: 6px solid {border_color}; padding-left: 12px; display: inline-flex; align-items: center; justify-content: flex-start; text-align: left !important; width: 100%; height: 28px;'>
+            <img src='data:image/png;base64,{b64_string}' style='height: 20px; width: auto; margin-right: 10px; vertical-align: middle; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));' />
+            <span style='font-size: 1em; font-weight: 500; color: #F3F4F6;'>{team_name}</span>
+        </div>
+        """
+    # Text backup layer if file missing completely
+    return f"<div style='border-left: 6px solid {border_color}; padding-left: 12px; text-align: left !important;'>{team_name}</div>"
 
 TRACK_METRICS = {
     "Australia": {"name": "Albert Park Circuit", "weather": "☀️ Sunny | Track Temp: 34°C"},
@@ -404,24 +416,17 @@ if trigger_prediction:
             st.markdown("<br><h3 style='margin-top: 25px;'>🏁 Full Predicted Grid Standing</h3>", unsafe_allow_html=True)
             st.markdown("---")
             
+            # --- 100% RESTORED original discrete row columns width [1, 2, 4, 2] ---
+            table_container_width = [1, 2, 4, 2]
             for idx, row in pred_df.iterrows():
-                row_cols = st.columns([1, 2, 4, 2])
+                row_cols = st.columns(table_container_width)
                 row_cols[0].markdown(f"**P{row['predicted_position']}**")
                 row_cols[1].markdown(row['_name'])
                 
-                # Fetching verified path dynamically WITH the .png strings parsed smoothly
-                logo_file_path = get_verified_logo_path(row['team'])
+                # Dynamic horizontal injection of base64 binary logo layout directly into Col 2 without splitting layout 
                 border_color = TEAM_COLORS.get(row['team'], '#FFFFFF')
-                
-                with row_cols[2]:
-                    st.markdown(f"<div style='border-left: 6px solid {border_color}; padding-left: 12px; display: flex; align-items: center; justify-content: flex-start;'>", unsafe_allow_html=True)
-                    
-                    logo_inner_cols = st.columns([1, 4])
-                    with logo_inner_cols[0]:
-                        if logo_file_path and os.path.exists(logo_file_path):
-                            st.image(logo_file_path, width=25)
-                    with logo_inner_cols[1]:
-                        st.markdown(f"<span style='font-size:1em; font-weight:500; color:#F3F4F6; margin-left:-18px;'>{row['team']}</span>", unsafe_allow_html=True)
+                logo_html_block = get_base64_logo_html(row['team'], border_color)
+                row_cols[2].markdown(logo_html_block, unsafe_allow_html=True)
                 
                 row_cols[3].markdown(f"Grid: {int(row['grid_position'])}")
                 
