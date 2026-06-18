@@ -207,18 +207,6 @@ TEAM_LOGOS_MAPPING = {
     "Williams": "team_logos/williams.png", "Williams Racing": "team_logos/williams.png", "Atlassian Williams F1 Team": "team_logos/williams.png"
 }
 
-# 22 Drivers Mapping for 2026 Season
-DRIVER_CODE_MAP = {
-    "Kimi Antonelli": "ANT", "Lewis Hamilton": "HAM", "George Russell": "RUS", 
-    "Charles Leclerc": "LEC", "Lando Norris": "NOR", "Oscar Piastri": "PIA", 
-    "Max Verstappen": "VER", "Pierre Gasly": "GAS", "Isack Hadjar": "HAD", 
-    "Liam Lawson": "LAW", "Oliver Bearman": "BEA", "Franco Colapinto": "COL", 
-    "Arvid Lindblad": "LIN", "Carlos Sainz Jr.": "SAI", "Alex Albon": "ALB", 
-    "Esteban Ocon": "OCO", "Gabriel Bortoleto": "BOR", "Fernando Alonso": "ALO", 
-    "Nico Hulkenberg": "HUL", "Valtteri Bottas": "BOT", "Sergio Perez": "PER", 
-    "Lance Stroll": "STR"
-}
-
 def get_base64_logo_html(team_name, border_color, centered=False):
     target_path = TEAM_LOGOS_MAPPING.get(team_name, "")
     if not os.path.exists(target_path):
@@ -258,19 +246,10 @@ TRACK_METRICS = {
     "Belgium": {"name": "Spa-Francorchamps", "weather": "☁️ Cloudy | Track Temp: 18°C"}
 }
 
-def get_driver_image(driver_name):
-    # Mapping se code uthao, agar nahi mila toh fallback
-    code = DRIVER_CODE_MAP.get(driver_name, "DEFAULT")
-    
-    local_path = os.path.join("drivers_images", f"{code}.png")
-    
-    if os.path.exists(local_path):
-        with open(local_path, "rb") as f:
-            data = base64.b64encode(f.read()).decode()
-            return f"data:image/png;base64,{data}"
-            
-    # Agar local file nahi mili, toh official fallback URL
-    return OFFICIAL_F1_IMAGES.get(code, "https://raw.githubusercontent.com/Formula-1-Dashboard/f1-assets/main/drivers/default.png")
+def get_driver_image(driver_code):
+    local_path = f"drivers_images/{driver_code}.png"
+    if os.path.exists(local_path): return local_path
+    return OFFICIAL_F1_IMAGES.get(driver_code, "https://media.formula1.com/d_driver_fallback_image.png")
 
 @st.cache_resource
 def load_model_bundle():
@@ -322,16 +301,19 @@ with row1_cols[0]:
     live_wdc_df = fetch_live_wdc_standings()
     leader_name = live_wdc_df.iloc[0]["Driver"] if not live_wdc_df.empty else "Kimi Antonelli"
     leader_team = live_wdc_df.iloc[0]["Team"] if not live_wdc_df.empty else "Mercedes"
+    leader_code = "ANT"
     border_color = TEAM_COLORS.get(leader_team, "#FF1801")
-
-    # Mapping se dynamic code fetch karo
-    img_src = get_driver_image(leader_name)
 
     # CSS HACK: Popover ko card ke upar transparent karke baitha rahe hain
     st.markdown("""
     <style>
     div[data-testid="stPopover"] {
-        position: absolute; width: 100%; height: 80px; z-index: 99; opacity: 0; cursor: pointer;
+        position: absolute;
+        width: 100%;
+        height: 80px;
+        z-index: 99;
+        opacity: 0;
+        cursor: pointer;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -340,10 +322,10 @@ with row1_cols[0]:
         st.markdown("<h3 style='color:#FF1801;'>🏆 Live WDC Standings</h3>", unsafe_allow_html=True)
         st.dataframe(live_wdc_df.set_index("Pos"), use_container_width=True)
 
-    # Permanent Card
+    # Permanent Card (Jo dikhega)
     st.markdown(f"""
     <div class='driver-card'>
-        <img src='{img_src}' style='width: 55px; height: 55px; border-radius: 50%; object-fit: cover;' />
+        <img src='{get_driver_image(leader_code)}' style='width: 55px; height: 55px; border-radius: 50%; object-fit: cover;' />
         <div class='data-section'>
             <div class='title-small'>WDC CONTENDER</div>
             <div class='driver-name'>{leader_name}</div>
