@@ -3,6 +3,7 @@ import pandas as pd
 import pickle
 import os
 import base64
+from datetime import datetime
 
 # Set page config for a widescreen racing dashboard layout
 st.set_page_config(page_title="F1 Race Predictor V3", page_icon="🏎️", layout="wide")
@@ -145,18 +146,65 @@ st.markdown("---")
 
 st.sidebar.header("🔧 Race Configuration")
 
-# Year statically locked to 2026 to ensure 22-driver mapping parity
+# Year statically locked to 2026
 year = 2026
 
-# Official 2026 Dynamic F1 Schedule List (Imola removed, Madrid added)
-available_races = [
-    "Australia", "China", "Japan", "Bahrain", "Saudi Arabia", "Miami", 
-    "Monaco", "Barcelona", "Canada", "Austria", "British", "Belgium", 
-    "Hungary", "Netherlands", "Monza", "Baku", "Singapore", "Austin", 
-    "Mexico", "Sao Paulo", "Las Vegas", "Qatar", "Abu Dhabi", "Madrid"
+# 2026 Schedule with approximate race dates for real-time live detection
+F1_2026_SCHEDULE = [
+    {"race": "Australia", "date": datetime(2026, 3, 15)},
+    {"race": "China", "date": datetime(2026, 3, 22)},
+    {"race": "Japan", "date": datetime(2026, 4, 5)},
+    {"race": "Bahrain", "date": datetime(2026, 4, 19)},
+    {"race": "Saudi Arabia", "date": datetime(2026, 5, 3)},
+    {"race": "Miami", "date": datetime(2026, 5, 17)},
+    {"race": "Monaco", "date": datetime(2026, 5, 31)},
+    {"race": "Barcelona", "date": datetime(2026, 6, 7)},
+    {"race": "Canada", "date": datetime(2026, 6, 21)},
+    {"race": "Austria", "date": datetime(2026, 7, 5)},
+    {"race": "British", "date": datetime(2026, 7, 12)},
+    {"race": "Belgium", "date": datetime(2026, 7, 26)},
+    {"race": "Hungary", "date": datetime(2026, 8, 2)},
+    {"race": "Netherlands", "date": datetime(2026, 8, 30)},
+    {"race": "Monza", "date": datetime(2026, 9, 6)},
+    {"race": "Baku", "date": datetime(2026, 9, 20)},
+    {"race": "Singapore", "date": datetime(2026, 10, 4)},
+    {"race": "Austin", "date": datetime(2026, 10, 25)},
+    {"race": "Mexico", "date": datetime(2026, 11, 1)},
+    {"race": "Sao Paulo", "date": datetime(2026, 11, 15)},
+    {"race": "Las Vegas", "date": datetime(2026, 11, 22)},
+    {"race": "Qatar", "date": datetime(2026, 12, 6)},
+    {"race": "Abu Dhabi", "date": datetime(2026, 12, 13)},
+    {"race": "Madrid", "date": datetime(2026, 12, 20)},
 ]
 
-race_name = st.sidebar.selectbox("Select Grand Prix", available_races)
+# Real-time Auto Detection Engine
+current_date = datetime.now()
+next_race_name = "Australia"  # Default fallback
+default_index = 0
+
+for i, event in enumerate(F1_2026_SCHEDULE):
+    if event["date"] >= current_date:
+        next_race_name = event["race"]
+        default_index = i
+        break
+else:
+    # If all races are over, fallback to last race
+    next_race_name = F1_2026_SCHEDULE[-1]["race"]
+    default_index = len(F1_2026_SCHEDULE) - 1
+
+# Extract pure string array for dropdown mapping consistency
+races_list = [event["race"] for event in F1_2026_SCHEDULE]
+
+# Dropdown automatically shifts index to target the actual next real race!
+race_name = st.sidebar.selectbox("Select Grand Prix", races_list, index=default_index)
+
+# Live status sub-card in sidebar
+st.sidebar.markdown(f"""
+<div style='background: #1C1C24; padding: 12px; border-radius: 8px; border-left: 4px solid #FF1801; margin-top: 10px;'>
+    <span style='color: #888888; font-size: 0.85em; text-transform: uppercase;'>Auto Detected Live Weekend</span><br>
+    <strong style='color: #FFFFFF; font-size: 1.1em;'>🎯 {next_race_name} GP</strong>
+</div>
+""", unsafe_allow_html=True)
 
 def get_driver_image(driver_code):
     local_path = f"drivers_images/{driver_code}.png"
@@ -168,7 +216,6 @@ if st.sidebar.button("🔮 Generate Grid Prediction", use_container_width=True):
     with st.spinner("Processing prediction..."):
         try:
             import predict_race_v3
-            # Fixed context routing passing frozen 2026 parameters
             pred_df = predict_race_v3.predict_race(year, race_name, None)
         except Exception as e:
             st.error(f"Failed to execute prediction pipeline: {e}")
