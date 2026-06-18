@@ -73,18 +73,6 @@ st.markdown(
         text-transform: uppercase;
         letter-spacing: 1px;
     }
-    
-    /* Centralized configuration panel style */
-    .config-card {
-        background: #14141C;
-        border: 1px solid rgba(255,255,255,0.05);
-        border-radius: 12px;
-        padding: 25px;
-        width: 100%;
-        max-width: 550px;
-        margin: 10px auto 30px auto;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
     </style>
     """,
     unsafe_allow_html=True
@@ -193,7 +181,7 @@ F1_2026_SCHEDULE = [
     {"round": 24, "race": "Abu Dhabi", "date_str": "04-06 DEC", "date": datetime(2026, 12, 6)},
 ]
 
-# Strict real-time upcoming target lookup matcher
+# Real-time Auto Detection Engine (Strict upcoming gap mapping logic)
 current_date = datetime.now()
 next_race_name = "Austria"
 next_race_date_str = "26-28 JUN"
@@ -209,26 +197,28 @@ for i, event in enumerate(F1_2026_SCHEDULE):
 # Map plain string array for seamless dropdown choice mappings
 races_list = [f"Round {e['round']}: {e['race']}" for e in F1_2026_SCHEDULE]
 
-# --- Center Configuration Panel ---
-st.markdown("<div class='config-card'>", unsafe_allow_html=True)
+# --- Perfectly Connected Center Layout Columns ---
+container_cols = st.columns([1.5, 2.5, 2.5, 1.5])
 
-col_left, col_right = st.columns([1.1, 0.9])
-with col_left:
+with container_cols[1]:
     selected_race_box = st.selectbox("Select Grand Prix", races_list, index=default_index)
-    # Extract structural plain race name string out of choice layout mapping
     race_name = F1_2026_SCHEDULE[races_list.index(selected_race_box)]["race"]
 
-with col_right:
+with container_cols[2]:
     st.markdown(f"""
-    <div style='background: #1C1C24; padding: 6px 12px; border-radius: 8px; border-left: 4px solid #FF1801; text-align: left !important; height: 58px;'>
+    <div style='background: #14141C; padding: 6px 14px; border-radius: 8px; border-left: 4px solid #FF1801; text-align: left !important; height: 58px; box-shadow: 0 4px 15px rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.02);'>
         <span style='color: #888888; font-size: 0.72em; text-transform: uppercase;'>Upcoming Live Weekend</span><br>
         <strong style='color: #FFFFFF; font-size: 0.95em; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;'>🎯 {next_race_name}</strong>
         <span style='color: #FF1801; font-size: 0.8em; font-weight: bold;'>📅 {next_race_date_str}</span>
     </div>
     """, unsafe_allow_html=True)
 
-trigger_prediction = st.button("🔮 Generate Grid Prediction", use_container_width=True)
-st.markdown("</div>", unsafe_allow_html=True)
+# Generate Button Row
+btn_cols = st.columns([2.5, 3, 2.5])
+with btn_cols[1]:
+    trigger_prediction = st.button("🔮 Generate Grid Prediction", use_container_width=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
 
 def get_driver_image(driver_code):
     local_path = f"drivers_images/{driver_code}.png"
