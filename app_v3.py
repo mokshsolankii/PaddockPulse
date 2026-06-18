@@ -69,32 +69,24 @@ st.markdown(
 
     /* Style override for popover telemetry cards to look like native blocks */
     div[data-testid="stPopover"] > button {
-        background: #14141C !important;
+        background: transparent !important;
         color: #F3F4F6 !important;
-        border: 1px solid rgba(255,255,255,0.05) !important;
-        border-radius: 12px !important;
-        padding: 15px !important;
+        border: none !important;
+        padding: 0px !important;
         width: 100% !important;
-        text-align: left !important;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important;
-        transition: all 0.3s ease;
-    }
-    div[data-testid="stPopover"] > button:hover {
-        border-color: #FF1801 !important;
-        background: #181824 !important;
+        text-align: center !important;
+        box-shadow: none !important;
+        font-size: 1.1em !important;
+        font-weight: 500 !important;
     }
     
-    /* Plain Telemetry Info Box Class */
-    .telemetry-box {
-        background: #14141C;
-        border: 1px solid rgba(255,255,255,0.05);
-        border-radius: 12px;
-        padding: 15px;
-        height: 58px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    /* Inline content text styling inside cards */
+    .card-text {
+        color: #888888;
+        font-size: 1.1em;
+        font-weight: 500;
+        margin: 0;
+        padding: 10px 0;
     }
     </style>
     """,
@@ -179,42 +171,43 @@ for i, event in enumerate(F1_2026_SCHEDULE):
 
 races_list = [f"Round {e['round']}: {e['race']}" for e in F1_2026_SCHEDULE]
 
-# --- Core Setup Controls ---
-header_cols = st.columns([2.5, 3, 2.5])
-with header_cols[1]:
+# =====================================================================
+# 📊 FIRST ORIGINAL MAIN ROW (3 BLOCKS: LEFT KHALI, CENTER DROP, RIGHT LAST RESULT)
+# =====================================================================
+main_row_cols = st.columns([2.5, 3, 2.5])
+
+with main_row_cols[0]:
+    # Left slot kept structurally clean as an empty styled block matching dashboard vibe
+    st.markdown("<div class='card-text'>👤 DRIVER STANDINGS</div>", unsafe_allow_html=True)
+
+with main_row_cols[1]:
+    # Center input tracking dropdown selector control
     selected_race_box = st.selectbox("Select Grand Prix Target", races_list, index=default_index)
     race_name = F1_2026_SCHEDULE[races_list.index(selected_race_box)]["race"]
 
-st.markdown("<br>", unsafe_allow_html=True)
-
-# =====================================================================
-# 📊 SIDE-BY-SIDE TELEMETRY STRIP (Focus on Bottom Right Block)
-# =====================================================================
-telemetry_cols = st.columns(4)
-
-# 1. Left Box (Placeholder heading)
-with telemetry_cols[0]:
-    st.markdown(f"<div class='telemetry-box'><span style='color:#888;'>👤 DRIVER STANDINGS</span></div>", unsafe_allow_html=True)
-
-# 2. Second Box (Placeholder heading)
-with telemetry_cols[1]:
-    st.markdown(f"<div class='telemetry-box'><span style='color:#888;'>🏎️ TEAM STANDINGS</span></div>", unsafe_allow_html=True)
-
-# 3. Third Box (Dynamic track name tracker based on dropdown)
-with telemetry_cols[2]:
-    track_info = TRACK_METRICS.get(race_name, {"name": "F1 Grand Prix Track"})
-    st.markdown(f"<div class='telemetry-box'><span style='color:#FFF; font-weight:500;'>🗺️ {track_info['name']}</span></div>", unsafe_allow_html=True)
-
-# 4. CHOSEN ACTIVE BLOCK: LAST RACE RESULT POPOVER
-with telemetry_cols[3]:
+with main_row_cols[2]:
+    # Right slot now holds the requested popover cleanly mapped into the exact grid block
     with st.popover("⏮️ Last GP Winner: Lewis Hamilton"):
         st.markdown("<h4 style='color:#FF1801;'>🏁 AWS Gran Premio de España Result</h4>", unsafe_allow_html=True)
         st.markdown("**1st:** Lewis Hamilton (Ferrari)<br>**2nd:** George Russell (Mercedes)<br>**3rd:** Lando Norris (McLaren)", unsafe_allow_html=True)
 
-# Central Prediction Execution Button
-btn_cols = st.columns([2.5, 3, 2.5])
-with btn_cols[1]:
+st.markdown("<br>", unsafe_allow_html=True)
+
+# =====================================================================
+# 📊 SECOND ROW (BUTTON & ACTIVE PLACEHOLDERS)
+# =====================================================================
+action_row_cols = st.columns([2.5, 3, 2.5])
+
+with action_row_cols[0]:
+    st.markdown("<div class='card-text'>🏎️ TEAM STANDINGS</div>", unsafe_allow_html=True)
+
+with action_row_cols[1]:
+    # Central targeted execution trigger button mapped directly inside center block
     trigger_prediction = st.button("🔮 Generate Grid Prediction Layout", use_container_width=True)
+
+with action_row_cols[2]:
+    track_info = TRACK_METRICS.get(race_name, {"name": "F1 Grand Prix Track"})
+    st.markdown(f"<div class='card-text' style='color:#FFF;'>🗺️ {track_info['name']}</div>", unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
