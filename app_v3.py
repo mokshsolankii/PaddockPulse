@@ -110,6 +110,7 @@ TEAM_LOGOS = {
     "Aston Martin Aramco F1 Team": "team_logos/astonmartin.png",
     "Audi Revolut F1 Team": "team_logos/audi.png",
     "Cadillac F1 Team": "team_logos/cadillac.png",
+    "Unknown": "team_logos/Unknown.png"
 }
 
 # Helper function to convert local image to inline safe Base64 source
@@ -145,15 +146,30 @@ st.markdown("---")
 st.sidebar.header("🔧 Race Configuration")
 year = st.sidebar.selectbox("Select Year", [2026, 2025, 2024])
 
-@st.cache_data
-def get_available_races():
-    try:
-        df = pd.read_csv("f1_training_data_v3.csv")
-        return sorted(df["race"].unique())
-    except Exception:
-        return ["Austria", "Monaco", "British", "Belgium", "Bahrain", "Singapore"]
+# Strict Dynamic F1 Schedule Mapping
+F1_CALENDARS = {
+    2026: [
+        "Australia", "China", "Japan", "Bahrain", "Saudi Arabia", "Miami", 
+        "Monaco", "Barcelona", "Canada", "Austria", "British", "Belgium", 
+        "Hungary", "Netherlands", "Monza", "Baku", "Singapore", "Austin", 
+        "Mexico", "Sao Paulo", "Las Vegas", "Qatar", "Abu Dhabi", "Madrid"
+    ],
+    2025: [
+        "Australia", "China", "Japan", "Bahrain", "Saudi Arabia", "Miami", 
+        "Emilia Romagna", "Monaco", "Barcelona", "Canada", "Austria", "British", 
+        "Belgium", "Hungary", "Netherlands", "Monza", "Baku", "Singapore", 
+        "Austin", "Mexico", "Sao Paulo", "Las Vegas", "Qatar", "Abu Dhabi"
+    ],
+    2024: [
+        "Bahrain", "Saudi Arabia", "Australia", "Japan", "China", "Miami", 
+        "Emilia Romagna", "Monaco", "Canada", "Barcelona", "Austria", "British", 
+        "Hungary", "Belgium", "Netherlands", "Monza", "Baku", "Singapore", 
+        "Austin", "Mexico", "Sao Paulo", "Las Vegas", "Qatar", "Abu Dhabi"
+    ]
+}
 
-available_races = get_available_races()
+# Fetch filtered list based on selection
+available_races = F1_CALENDARS.get(year, ["Bahrain", "Monaco", "Monza"])
 race_name = st.sidebar.selectbox("Select Grand Prix", available_races)
 round_num = st.sidebar.number_input("Round Number (Optional)", min_value=1, max_value=25, value=8)
 
@@ -183,7 +199,7 @@ if st.sidebar.button("🔮 Generate Grid Prediction", use_container_width=True):
                 p2_row = pred_df.iloc[1]
                 p2_img = get_driver_image(p2_row['driver'])
                 p2_color = TEAM_COLORS.get(p2_row['team'], "#FFFFFF")
-                p2_logo_path = TEAM_LOGOS.get(p2_row['team'], TEAM_LOGOS["Unknown"])
+                p2_logo_path = TEAM_LOGOS.get(p2_row['team'], "team_logos/Unknown.png")
                 p2_base64 = get_base64_image(p2_logo_path)
                 with podium_cols[0]:
                     st.markdown("<div style='border-top: 4px solid #C0C0C0; padding-top: 10px; margin-bottom: 15px;'><span class='pos-badge' style='background:#C0C0C0; color:#111;'>🥈 P2</span></div>", unsafe_allow_html=True)
@@ -198,7 +214,7 @@ if st.sidebar.button("🔮 Generate Grid Prediction", use_container_width=True):
                 p1_row = pred_df.iloc[0]
                 p1_img = get_driver_image(p1_row['driver'])
                 p1_color = TEAM_COLORS.get(p1_row['team'], "#FFFFFF")
-                p1_logo_path = TEAM_LOGOS.get(p1_row['team'], TEAM_LOGOS["Unknown"])
+                p1_logo_path = TEAM_LOGOS.get(p1_row['team'], "team_logos/Unknown.png")
                 p1_base64 = get_base64_image(p1_logo_path)
                 with podium_cols[1]:
                     st.markdown("<div style='border-top: 4px solid #FFD700; padding-top: 10px; margin-bottom: 15px;'><span class='pos-badge' style='background:#FFD700; color:#111;'>🏆 WINNER</span></div>", unsafe_allow_html=True)
@@ -213,7 +229,7 @@ if st.sidebar.button("🔮 Generate Grid Prediction", use_container_width=True):
                 p3_row = pred_df.iloc[2]
                 p3_img = get_driver_image(p3_row['driver'])
                 p3_color = TEAM_COLORS.get(p3_row['team'], "#FFFFFF")
-                p3_logo_path = TEAM_LOGOS.get(p3_row['team'], TEAM_LOGOS["Unknown"])
+                p3_logo_path = TEAM_LOGOS.get(p3_row['team'], "team_logos/Unknown.png")
                 p3_base64 = get_base64_image(p3_logo_path)
                 with podium_cols[2]:
                     st.markdown("<div style='border-top: 4px solid #CD7F32; padding-top: 10px; margin-bottom: 15px;'><span class='pos-badge' style='background:#CD7F32; color:#111;'>🥉 P3</span></div>", unsafe_allow_html=True)
@@ -240,7 +256,7 @@ if st.sidebar.button("🔮 Generate Grid Prediction", use_container_width=True):
                 start_grid = f"Grid: {int(row['grid_position'])}"
                 
                 team_color = TEAM_COLORS.get(team_name, "#FFFFFF")
-                t_logo_path = TEAM_LOGOS.get(team_name, TEAM_LOGOS["Unknown"])
+                t_logo_path = TEAM_LOGOS.get(team_name, "team_logos/Unknown.png")
                 t_base64 = get_base64_image(t_logo_path)
                 
                 row_cols = st.columns([1, 2, 4, 2])
