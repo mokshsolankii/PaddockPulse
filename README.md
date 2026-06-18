@@ -1,166 +1,52 @@
-# 🏎️ F1 Race Predictor V3
+# 🏎️ Formula 1 Race Outcome Predictor V3
 
-A machine learning project that predicts Formula 1 race outcomes and upcoming Grand Prix results using historical race data, qualifying performance, driver form, team form, championship standings, and circuit-specific insights.
+An elite, production-grade F1 Race Outcome Predictor and Telemetry Dashboard. Powered by a **CatBoost Machine Learning core** and dynamic rolling form analytics, this application delivers grid standing predictions via a premium, dark-mode immersive user interface mimicking real-world team paddock consoles.
 
----
-
-## 🚀 Project Overview
-
-The project evolved from a simple race outcome classifier into a race position prediction system capable of forecasting upcoming Formula 1 races using real qualifying data and championship standings.
-
-The model uses data collected through FastF1, enhanced with multiple engineered features, and trained using CatBoost Regression to predict a driver's finishing position.
+🚀 **Live Deployment:** (https://f1-race-outcome-predictor-iwuzuknhwa7nkkgnms4pvu.streamlit.app/)
 
 ---
 
-## ✨ Features
+## 🌟 Key Features
 
-### Data Collection
-
-* Historical Formula 1 race data (2022–2026)
-* Real qualifying session data via FastF1
-* Driver standings from Jolpi API
-* Constructor standings from Jolpi API
-* Weather and circuit information
-
-### Feature Engineering
-
-* Qualifying lap time
-* Grid position
-* Pole gap
-* Driver championship points
-* Constructor championship points
-* Driver form (last 3 races)
-* Team form (last 3 races)
-* Driver track history
-* Circuit type
-* Starting tyre compound
-* Weather conditions
-
-### Prediction Capabilities
-
-* Exact finishing position prediction
-* Upcoming race prediction
-* Automatic qualifying data integration
-* Championship standings integration
-* Full race grid forecasting
+* **Advanced Predictive Engine:** CatBoost Regressor utilizing multi-season historical data, dynamic driver forms, and circuit-specific metrics.
+* **Premium Paddock UI:** High-end dark telemetry dashboard layout featuring minimalist 3D podium cards, interactive hover glows, and precise grid layouts built using custom CSS overrides.
+* **Optimized Asset Pipeline:** Smart-routed driver portrait streams and sandboxed inline **Base64 binary team logo streams** to completely bypass cross-origin network hotlinking blocks.
+* **Dynamic Form Factors:** Multi-year support with robust fallback mapping mechanisms for missing data points or sudden driver changes.
 
 ---
 
-## 📊 Dataset
+## 📊 System Architecture & Data Pipeline
 
-| Metric          | Value     |
-| --------------- | --------- |
-| Total Rows      | 1,954     |
-| Total Races     | 98        |
-| Features        | 19        |
-| Seasons Covered | 2022–2026 |
+The system is engineered as a decoupled, multi-stage data processing and machine learning pipeline:
 
----
-
-## 🤖 Model
-
-### CatBoostRegressor
-
-The current version uses CatBoost Regression to predict a driver's finishing position rather than classifying outcomes into broad categories.
-
-### Performance
-
-| Metric                    | Score     |
-| ------------------------- | --------- |
-| MAE (Mean Absolute Error) | **3.070** |
-| Top-3 Accuracy            | **89.3%** |
-| Top-10 Accuracy           | **81.2%** |
-
-### Previous Version Comparison
-
-| Version | Model                                 | Performance     |
-| ------- | ------------------------------------- | --------------- |
-| V1      | Random Forest Classifier              | 65.78% Accuracy |
-| V2      | CatBoostRegressor                     | 3.112 MAE       |
-| V3      | CatBoostRegressor + Advanced Features | **3.070 MAE**   |
+1. **Ingestion Layer:** Pulls historical and real-time session telemetry, qualifying results, and driver/constructor metrics using the `FastF1` API and historical data matrices.
+2. **Feature Engineering Engine:** Computes dynamic rolling form metrics (e.g., driver's average finish position over the last $N$ races, team constructor velocity).
+3. **Inference Pipeline:** Loads the optimized CatBoost model bundle (`f1_model_v3.pkl`), validates structural schema inputs, and outputs full predicted race standings.
+4. **Presentation Layer:** Renders a sandboxed high-performance layout on Streamlit Cloud utilizing low-latency base64 graphics injection.
 
 ---
 
-## 🛠️ Technologies Used
+## 🛠️ Tech Stack & Architecture Components
 
-* Python
-* FastF1
-* Pandas
-* NumPy
-* CatBoost
-* Scikit-Learn
-* Streamlit
-* Requests
-* Jolpi API
-  
----
-
-## 🔮 Example Prediction Workflow
-
-1. Fetch latest qualifying data
-2. Retrieve driver standings
-3. Retrieve constructor standings
-4. Generate driver-specific features
-5. Predict finishing positions
-6. Rank drivers by predicted finish
-7. Generate projected race results
+* **Frontend Framework:** Streamlit (Custom CSS injected via unsafe HTML scopes)
+* **Machine Learning Core:** CatBoost (Gradient Boosting on Decision Trees)
+* **Data Pipelines & Manipulation:** Pandas, NumPy
+* **Data Serialization:** Pickle Protocol
+* **Domain Telemetry Provider:** FastF1 API
 
 ---
 
-## 🏁 Current Capabilities
+## 📦 Installation & Local Setup
 
-✅ Historical race prediction
-
-✅ Upcoming race prediction
-
-✅ Real qualifying pace integration
-
-✅ Driver form tracking
-
-✅ Team form tracking
-
-✅ Championship standings integration
-
-✅ Circuit history analysis
-
-✅ Pole gap analysis
-
-✅ Automated race forecasting
-
----
-
-## 📈 Future Improvements
-
-* Streamlit App V3
-* Driver profile photos
-* Interactive podium visualization
-* Monte Carlo race simulations
-* DNF probability prediction
-* Weather-aware forecasting
-* Head-to-head driver comparisons
-
----
-
-## ▶️ How to Run
-
-Install dependencies:
+To clone and spin up this elite F1 telemetry instance locally, run the following sequence in your terminal:
 
 ```bash
+# 1. Clone the repository
+git clone [https://github.com/mokshsolanki/F1-Race-Outcome-Predictor.git](https://github.com/mokshsolanki/F1-Race-Outcome-Predictor.git)
+cd F1-Race-Outcome-Predictor
+
+# 2. Install pristine package dependencies
 pip install -r requirements.txt
-```
 
-Run the dashboard:
-
-```bash
-python -m streamlit run app_v1.py
-```
-
----
-
-## 👨‍💻 Author
-
-**Moksh Solanki**
-
-First-year Computer Science Engineering student at DY Patil International University, Pune.
-
-Interested in Machine Learning, Data Science, Cybersecurity, and Motorsport Analytics.
+# 3. Launch the local Streamlit sandbox instance
+streamlit run app_v3.py
