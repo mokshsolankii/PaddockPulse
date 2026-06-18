@@ -158,6 +158,10 @@ st.markdown(
 
     /* Style override for popover telemetry cards */
     div[data-testid="stPopover"] { width: 100% !important; }
+
+
+    [data-testid="stPopover"] { position: relative; margin-bottom: -70px; z-index: 10; opacity: 0; }
+    [data-testid="stPopover"] > button { height: 70px; }
     </style>
     """,
     unsafe_allow_html=True
