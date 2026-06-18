@@ -216,26 +216,26 @@ def get_base64_logo_html(team_name, border_color, centered=False):
         with open(target_path, "rb") as img_file:
             b64_string = base64.b64encode(img_file.read()).decode()
         
-        # Dynamic Scaler for McLaren logo size optimization
-        logo_height = "28px" if "mclaren" in team_name.lower() else "20px"
+        # Strict case-insensitive matching string parameter override to boost McLaren scale layout
+        logo_height = "38px" if "mclaren" in team_name.lower() else "20px"
         
         # Apply strict symmetrical centering context mechanics if requested
         if centered:
             return f"""
-            <div style='display: inline-flex; align-items: center; justify-content: center; text-align: center !important; width: 100%; height: 28px;'>
+            <div style='display: inline-flex; align-items: center; justify-content: center; text-align: center !important; width: 100%; height: 38px;'>
                 <img src='data:image/png;base64,{b64_string}' style='height: {logo_height}; width: auto; margin-right: 8px; vertical-align: middle; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));' />
                 <span style='font-size: 1em; font-weight: 500; color: #F3F4F6;'>{team_name}</span>
             </div>
             """
         else:
             return f"""
-            <div style='border-left: 6px solid {border_color}; padding-left: 6px; display: inline-flex; align-items: center; justify-content: flex-start; text-align: left !important; width: 100%; height: 28px;'>
-                <img src='data:image/png;base64,{b64_string}' style='height: {logo_height}; width: auto; margin-right: 10px; vertical-align: middle; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));' />
+            <div style='border-left: 6px solid {border_color}; padding-left: 10px; display: inline-flex; align-items: center; justify-content: flex-start; text-align: left !important; width: 100%; height: 38px;'>
+                <img src='data:image/png;base64,{b64_string}' style='height: {logo_height}; width: auto; margin-right: 12px; vertical-align: middle; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));' />
                 <span style='font-size: 1em; font-weight: 500; color: #F3F4F6;'>{team_name}</span>
             </div>
             """
     
-    align_style = "text-align: center !important;" if centered else f"border-left: 6px solid {border_color}; padding-left: 6px; text-align: left !important;"
+    align_style = "text-align: center !important;" if centered else f"border-left: 6px solid {border_color}; padding-left: 10px; text-align: left !important;"
     return f"<div style='{align_style}'>{team_name}</div>"
 
 TRACK_METRICS = {
