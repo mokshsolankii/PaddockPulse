@@ -5,11 +5,10 @@ import os
 import base64
 from datetime import datetime
 
-# ==================== 1. HELPER FUNCTIONS & MAPPINGS (DEFINED FIRST) ====================
+# ==================== 1. HELPER FUNCTIONS & MAPPINGS ====================
 
-@st.cache_data(ttl=3600)  # Data stays cached for 1 hour so the app remains blazing fast
+@st.cache_data(ttl=3600)
 def fetch_live_wdc_standings():
-    # --- METHOD 1: Try Live Ergast/OpenF1 API ---
     try:
         url = "http://ergast.com/api/f1/current/driverStandings.json"
         df_list = pd.read_json(url)
@@ -26,15 +25,13 @@ def fetch_live_wdc_standings():
         return pd.DataFrame({
             "Pos": pos_list, "Driver": driver_list, "Team": team_list, "Points": points_list
         })
-    except Exception as e:
-        pass  # Move to next method if API fails or times out
+    except Exception:
+        pass
 
-    # --- METHOD 2: Live HTML Web Scraping Fallback from Official F1 Site ---
     try:
         scrape_url = "https://www.formula1.com/en/results.html/2026/drivers.html"
         tables = pd.read_html(scrape_url)
         f1_table = tables[0]
-        
         f1_table = f1_table.dropna(subset=['Pos'])
         pos_list = f1_table['Pos'].astype(int).tolist()
         driver_list = f1_table['Driver'].apply(lambda x: " ".join(str(x).split()[:-1])).tolist()
@@ -44,8 +41,7 @@ def fetch_live_wdc_standings():
         return pd.DataFrame({
             "Pos": pos_list, "Driver": driver_list, "Team": team_list, "Points": points_list
         })
-    except Exception as scrape_error:
-        # --- METHOD 3: 100% Validated 2026 Official Lineup Array Backup ---
+    except Exception:
         return pd.DataFrame({
             "Pos": list(range(1, 23)),
             "Driver": [
@@ -65,7 +61,6 @@ def fetch_live_wdc_standings():
             "Points": [156, 115, 106, 75, 73, 68, 55, 41, 34, 28, 18, 16, 13, 6, 5, 3, 2, 1, 0, 0, 0, 0]
         })
 
-# Official Fallbacks Mapping System
 OFFICIAL_F1_IMAGES = {
     "RUS": "https://media.formula1.com/content/dam/fom-website/drivers/G/GEORUS01_George_Russell/georus01.png",
     "HAM": "https://media.formula1.com/content/dam/fom-website/drivers/L/LEWHAM01_Lewis_Hamilton/lewham01.png",
@@ -176,11 +171,9 @@ st.set_page_config(page_title="PaddockPulse", page_icon="🏎️", layout="wide"
 st.markdown(
     """
     <style>
-    /* Hide Sidebar Elements completely to enforce central layout */
     [data-testid="stSidebar"] { display: none !important; }
     [data-testid="stSidebarCollapseButton"] { display: none !important; }
     
-    /* Global Background and Typography */
     .stApp {
         background-color: #0F0F14 !important;
         color: #F3F4F6 !important;
@@ -190,7 +183,6 @@ st.markdown(
         font-family: 'Titillium Web', 'Segoe UI', sans-serif !important;
     }
     
-    /* Clear default padding inside horizontal layout rows */
     [data-testid="stHorizontalBlock"] {
         gap: 16px !important;
     }
@@ -217,72 +209,76 @@ st.markdown(
         background: #1c1c26 !important;
     }
     
-    /* ==================== CRITICAL FIX FOR COLUMN 2 VERTICAL CONTAINER BLOCK ==================== */
-    /* Forces Streamlit's inner block containers inside Column 2 to have 0px gap to prevent misalignment */
-    div[data-testid="stColumn"]:nth-of-type(2) div[data-testid="stVerticalBlock"] {
-        gap: 0px !important;
-    }
-    
-    .gp-unified-card {
-        background: #181820 !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.04) !important;
-        border-left: 1px solid rgba(255, 255, 255, 0.04) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.04) !important;
-        border-radius: 10px 10px 0 0 !important;
-        padding: 14px 16px 2px 16px !important;
-        height: 38px !important;
-        box-sizing: border-box !important;
-    }
-    .gp-card-label {
-        color: #888888 !important; 
-        font-size: 0.72em !important; 
-        font-weight: 600 !important; 
-        text-transform: uppercase !important; 
-        letter-spacing: 0.8px !important; 
-        line-height: 1.2 !important; 
-        text-align: center !important;
-    }
+    /* ==================== 🛠️ 100% BULLETPROOF UNIFIED SELECTBOX CARD 🛠️ ==================== */
+    /* Target Column 2's Streamlit widget container exclusively and transform it into the actual structural card */
     div[data-testid="stColumn"]:nth-of-type(2) div[data-testid="stSelectbox"] {
         background: #181820 !important;
-        border-left: 1px solid rgba(255, 255, 255, 0.04) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.04) !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
-        border-radius: 0 0 10px 10px !important;
-        padding: 0px 16px 14px 16px !important;
-        margin-top: 0px !important; 
-        height: 57px !important; /* 38px + 57px = Exactly 95px Height Match */
+        border: 1px solid rgba(255, 255, 255, 0.04) !important;
+        border-radius: 10px !important;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35) !important;
+        
+        /* Layout Configuration */
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-end !important; /* Pushes input field down dynamically */
+        
+        /* Dimensions match paddock-box exactly */
+        min-height: 95px !important;
+        max-height: 95px !important;
+        padding: 12px 16px 12px 16px !important;
         box-sizing: border-box !important;
+        position: relative !important;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
+
+    /* Injecting "SELECT GRAND PRIX" heading as an absolute CSS pseudo-element directly inside the widget card */
+    div[data-testid="stColumn"]:nth-of-type(2) div[data-testid="stSelectbox"]::before {
+        content: "SELECT GRAND PRIX" !important;
+        position: absolute !important;
+        top: 15px !important;
+        left: 0 !important;
+        width: 100% !important;
+        text-align: center !important;
+        
+        /* Branding design typography styles */
+        color: #888888 !important;
+        font-size: 0.72rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.8px !important;
+        font-family: 'Titillium Web', 'Segoe UI', sans-serif !important;
+    }
+
+    /* Completely terminate native label space blocks to ensure perfect layout ceiling room */
     div[data-testid="stColumn"]:nth-of-type(2) label[data-testid="stWidgetLabel"] {
         display: none !important;
         height: 0px !important;
         margin: 0px !important;
         padding: 0px !important;
     }
+
+    /* Precision positioning of actual dynamic internal select input container box */
     div[data-testid="stColumn"]:nth-of-type(2) div[role="combobox"] {
         background-color: rgba(255, 255, 255, 0.02) !important;
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: 6px !important;
         color: #F3F4F6 !important;
+        height: 40px !important;
+        margin-top: auto !important; /* Snaps input strictly to the bottom area safely */
     }
-    div[data-testid="stColumn"]:nth-of-type(2):hover .gp-unified-card {
+
+    /* Unified Hover Interactions Synchronization */
+    div[data-testid="stColumn"]:nth-of-type(2) div[data-testid="stSelectbox"]:hover {
+        transform: translateY(-2px) !important;
         border-color: rgba(255, 24, 1, 0.25) !important;
         background: #1c1c26 !important;
     }
-    div[data-testid="stColumn"]:nth-of-type(2):hover div[data-testid="stSelectbox"] {
-        border-color: rgba(255, 24, 1, 0.25) !important;
-        background: #1c1c26 !important;
-    }
-    /* ================================================================================= */
+    /* ======================================================================================= */
     
-    /* Super clean container layout for Interactive Popover buttons */
     .interactive-wrapper {
         position: relative;
         width: 100%;
     }
     
-    /* Target transparent overlays precisely */
     .popover-anchor div[data-testid="stPopover"] {
         position: absolute;
         top: 0;
@@ -300,7 +296,6 @@ st.markdown(
         cursor: pointer !important;
     }
     
-    /* Custom Badge Styles for Positions */
     .pos-badge {
         background: #FF1801;
         color: white;
@@ -326,11 +321,9 @@ bundle = load_model_bundle()
 if bundle is None: st.stop()
 model, ALL_FEATURES = bundle["model"], bundle["features"]
 
-# --- Header Branding ---
 st.markdown("<h1 style='color: #FF1801; font-weight: bold; margin-top: -10px; margin-bottom: 2px;'>Formula 1 Race Outcome Predictor V3</h1>", unsafe_allow_html=True)
 st.markdown("<p style='font-size: 1.0em; color: #888888; margin-bottom: 25px;'>Powered by CatBoost & Dynamic Rolling Form Analytics</p>", unsafe_allow_html=True)
 
-# Complete F1 Schedule Setup
 F1_2026_SCHEDULE = [
     {"round": 1, "race": "Australia", "date_str": "06-08 MAR", "date": datetime(2026, 3, 8)},
     {"round": 2, "race": "China", "date_str": "13-15 MAR", "date": datetime(2026, 3, 15)},
@@ -453,21 +446,13 @@ with row1_cols[0]:
     """, unsafe_allow_html=True)
 
 with row1_cols[1]:
-    # Custom Header Div
-    st.markdown("""
-    <div class="gp-unified-card">
-        <div class="gp-card-label">SELECT GRAND PRIX</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Streamlit Selectbox Component (Spacing Gap is now overridden via global CSS)
+    # Streamlit Selectbox Component (Heading & Layout Box handles implicitly now via pseudo-classes)
     selected_option = st.selectbox(
-        "Select Grand Prix",
+        "Select Grand Prix Hidden Base Label",
         options=races_list,
         index=default_index,
-        key="dashboard_gp_selector_final"
+        key="dashboard_gp_selector_v4_perfect"
     )
-    
     race_name = selected_option.split(": ")[-1]
 
 with row1_cols[2]:
