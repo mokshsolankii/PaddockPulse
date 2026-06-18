@@ -171,7 +171,7 @@ TRACK_METRICS = {
 
 # ==================== 2. APP PAGE CONFIGURATION ====================
 
-st.set_page_config(page_title="PaddockPulse", page_icon="🏎️", layout="wide")
+st.set_page_config(page_title="PaddockGrid", page_icon="🏎️", layout="wide")
 
 # Custom global UI overrides for an elite F1 Telemetry Dashboard
 st.markdown(
@@ -318,6 +318,15 @@ st.markdown(
         text-transform: uppercase;
         letter-spacing: 1px;
     }
+      .grid-row-container {
+        background: #14141c;
+        border-radius: 6px;
+        padding: 10px 15px;
+        margin-bottom: 6px;
+        border-left: 4px solid #333;
+        display: flex;
+        align-items: center;
+    }
     </style>
     """,
     unsafe_allow_html=True
@@ -334,7 +343,7 @@ if bundle is None: st.stop()
 model, ALL_FEATURES = bundle["model"], bundle["features"]
 
 st.markdown("<h1 style='color: #FF1801; font-weight: bold; margin-top: -10px; margin-bottom: 2px;'>Formula 1 Race Outcome Predictor V3</h1>", unsafe_allow_html=True)
-st.markdown("<p style='font-size: 1.0em; color: #888888; margin-bottom: 25px;'>Powered by CatBoost & Dynamic Rolling Form Analytics</p>", unsafe_allow_html=True)
+st.markdown("<p style='font-size: 1.0em; color: #888888; margin-bottom: 25px;'>⚡ Telemetry Analytics • Straight from the pitlane, onto the grid ⚡</p>", unsafe_allow_html=True)
 
 F1_2026_SCHEDULE = [
     {"round": 1, "race": "Australia", "date_str": "06-08 MAR", "date": datetime(2026, 3, 8)},
@@ -429,7 +438,7 @@ with row1_cols[0]:
         left: 12px;
         bottom: 5px; /* Avatar thoda sa bahar pop-out karega premium feel ke liye */
         width: 85px;
-        height: 110px; /* Avatar ki height halki si adjust ki taaki cut na ho */
+        height: 105px; /* Avatar ki height halki si adjust ki taaki cut na ho */
         object-fit: contain;
         z-index: 10;
         filter: drop-shadow(0 8px 12px rgba(0,0,0,0.5));
