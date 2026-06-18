@@ -110,7 +110,6 @@ TEAM_LOGOS = {
     "Aston Martin Aramco F1 Team": "team_logos/astonmartin.png",
     "Audi Revolut F1 Team": "team_logos/audi.png",
     "Cadillac F1 Team": "team_logos/cadillac.png",
-    "Unknown": "team_logos/unknown.png"
 }
 
 # Helper function to convert local image to inline safe Base64 source
