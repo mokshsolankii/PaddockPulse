@@ -216,6 +216,12 @@ st.markdown(
         box-shadow: 0 0 20px rgba(255, 24, 1, 0.35) !important;
     }
 
+    /* Force Circuit Details box to exactly match Last Race Result box height (130px) */
+    #circuit-details-box {
+        min-height: 130px !important;
+        max-height: 130px !important;
+    }
+
     /* Prediction button styled directly (single real button, no duplicate box) */
     div[data-testid="stHorizontalBlock"] div[data-testid="stColumn"]:nth-of-type(2) div[data-testid="stButton"] button {
         background: #181820 !important;
@@ -623,7 +629,7 @@ row2_cols = st.columns(3)
 with row2_cols[0]:
     track_info = TRACK_METRICS.get(race_name, {"name": "F1 Grand Prix Track", "weather": "Fetching Live Status..."})
     st.markdown(f"""
-    <div class="paddock-box" style="border-left: 4px solid #64C4FF; align-items: center; text-align: center !important; min-height: 130px !important; max-height: 130px !important;">
+    <div id="circuit-details-box" class="paddock-box" style="border-left: 4px solid #64C4FF; align-items: center; text-align: center !important;">
         <span style='font-size: 1.1em; font-weight: 600; color: #FFF;'>Circuit details</span>
         <span style='color: #888888; font-size: 0.85em; margin-top: 3px;'>&#x1F5FA; {track_info['name']} &bull; {track_info['weather']}</span>
     </div>
