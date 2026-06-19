@@ -338,21 +338,20 @@ st.markdown(
     }
 
     /* WCC card */
-    .wcc-wrapper-box { position: relative !important; width: 100%; height: 115px; display: flex; align-items: flex-end; }
+    .wcc-wrapper-box { position: relative !important; width: 100%; height: 115px; display: flex; align-items: flex-end; overflow: visible; }
     .wcc-contender-card {
         background: #181820 !important; border: 1px solid rgba(255, 255, 255, 0.04) !important;
-        border-radius: 10px !important; padding: 12px 16px !important;
+        border-radius: 10px !important; padding: 12px 100px 12px 16px !important;
         display: flex !important; flex-direction: column !important;
-        justify-content: center !important; align-items: center !important;
-        text-align: center !important; width: 100%; height: 115px !important;
+        justify-content: center !important; align-items: flex-start !important;
+        text-align: left !important; width: 100%; height: 115px !important;
         box-sizing: border-box; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        margin-bottom: 12px !important;
+        margin-bottom: 12px !important; position: relative !important;
     }
     .wcc-wrapper-box:hover .wcc-contender-card {
-        transform: translateY(-4px) !important; border-color: rgba(255, 24, 1, 0.4) !important;
+        border-color: rgba(255, 24, 1, 0.4) !important;
         background: #1c1c26 !important; box-shadow: 0 0 20px rgba(255, 24, 1, 0.35) !important;
     }
-    .wcc-wrapper-box:hover img { transform: scale(1.08); }
     </style>
     """,
     unsafe_allow_html=True
@@ -465,27 +464,53 @@ with row1_cols[3]:
     wcc_leader_team = "Mercedes"
     wcc_accent_color = TEAM_COLORS.get(wcc_leader_team, "#27F4D2")
     logo_path = "team_logos/mercedes.png"
+
+    # Build a large b64 logo for the 3D floating treatment
+    wcc_logo_b64 = None
     if os.path.exists(logo_path):
         with open(logo_path, "rb") as img_file:
-            b64_string = base64.b64encode(img_file.read()).decode()
-        logo_html = f'<img src="data:image/png;base64,{b64_string}" style="height: 32px; width: auto; margin-right: 10px; transition: transform 0.3s ease; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));" />'
+            wcc_logo_b64 = base64.b64encode(img_file.read()).decode()
+
+    if wcc_logo_b64:
+        logo_img_tag = f'<img class="wcc-3d-logo" src="data:image/png;base64,{wcc_logo_b64}" />'
     else:
-        logo_html = f'<img src="https://media.formula1.com/content/dam/fom-website/teams/2026/mercedes.png" style="height: 32px; width: auto; margin-right: 10px; transition: transform 0.3s ease;" />'
+        logo_img_tag = f'<img class="wcc-3d-logo" src="https://media.formula1.com/content/dam/fom-website/teams/2026/mercedes.png" />'
 
     st.markdown(f"""
-    <div class="wcc-wrapper-box">
-        <div class="wcc-contender-card" style="border-left: 5px solid {wcc_accent_color};">
-            <div style="color: #888888; font-size: 0.72em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;">WCC CONTENDER</div>
-            <div style="display: inline-flex; align-items: center; justify-content: center; margin-bottom: 4px; width: 100%;">
-                {logo_html}
-                <span style="color: #FFFFFF; font-size: 1.25em; font-weight: bold;">{wcc_leader_team}</span>
-            </div>
-            <div style="font-size: 0.85em; color: #BBBBBB; font-weight: 500;">Current Championship Leader</div>
+    <style>
+    /* WCC 3D logo — floats bottom-right, mirrors WDC avatar treatment */
+    .wcc-3d-logo {{
+        position: absolute;
+        right: 10px;
+        bottom: 0px;
+        width: 90px;
+        height: 105px;
+        object-fit: contain;
+        z-index: 10;
+        filter: drop-shadow(0 8px 16px rgba(0,0,0,0.55)) brightness(1.05);
+        transition: transform 0.3s ease, filter 0.3s ease;
+        pointer-events: none;
+    }}
+    .wcc-wrapper-box:hover .wcc-3d-logo {{
+        transform: translateY(-5px) scale(1.06);
+        filter: drop-shadow(0 12px 20px {wcc_accent_color}55) brightness(1.15);
+    }}
+    /* Override card to left-align text like WDC, leave right side open for logo */
+    .wcc-contender-card {{
+        padding: 12px 100px 12px 16px !important;
+        align-items: flex-start !important;
+        text-align: left !important;
+    }}
+    </style>
+    <div class="wcc-wrapper-box" style="transform: translateY(-15px);">
+        {logo_img_tag}
+        <div class="wcc-contender-card">
+            <div style="color: #888888; font-size: 0.72em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2;">WCC CONTENDER</div>
+            <div style="color: #FFFFFF; font-size: 1.25em; font-weight: bold; margin: 3px 0; line-height: 1.2;">{wcc_leader_team}</div>
+            <div style="border-left: 3px solid {wcc_accent_color}; padding-left: 8px; font-size: 0.85em; color: #BBBBBB; font-weight: 500; margin-top: 3px; line-height: 1.2;">Championship Leader</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
-wcc_data = pd.DataFrame({"Pos": [1, 2, 3, 4, 5], "Team": ["Mercedes", "Ferrari", "McLaren", "Red Bull Racing", "Cadillac"], "Points": [262, 190, 141, 89, 0]})
-st.table(wcc_data.set_index("Pos"))
 
 # ==================== ROW 2 CONSOLE INTERFACES ====================
 row2_cols = st.columns(3)
