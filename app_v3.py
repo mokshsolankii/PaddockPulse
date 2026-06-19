@@ -216,7 +216,28 @@ st.markdown(
         box-shadow: 0 0 20px rgba(255, 24, 1, 0.35) !important;
     }
 
-    /* Prediction button overlay handled by .button-anchor rules below */
+    /* Prediction button styled directly (single real button, no duplicate box) */
+    div[data-testid="stHorizontalBlock"] div[data-testid="stColumn"]:nth-of-type(2) div[data-testid="stButton"] button {
+        background: #181820 !important;
+        border: 1px solid rgba(255, 255, 255, 0.04) !important;
+        border-left: 4px solid #27F4D2 !important;
+        border-radius: 10px !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35) !important;
+        color: #27F4D2 !important;
+        font-weight: 600 !important;
+        font-size: 1.05em !important;
+        min-height: 130px !important;
+        max-height: 130px !important;
+        width: 100% !important;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    div[data-testid="stHorizontalBlock"] div[data-testid="stColumn"]:nth-of-type(2) div[data-testid="stButton"] button:hover {
+        transform: translateY(-2px) !important;
+        border-color: rgba(255, 24, 1, 0.25) !important;
+        background: #1c1c26 !important;
+        box-shadow: 0 0 20px rgba(255, 24, 1, 0.35) !important;
+        color: #27F4D2 !important;
+    }
 
     /* ==================== UNIFIED SELECTBOX CARD (REALIGNED) ==================== */
     div[data-testid="stColumn"]:nth-of-type(2) div[data-testid="stSelectbox"] {
@@ -278,22 +299,7 @@ st.markdown(
         width: 100%;
     }
 
-    .button-anchor div[data-testid="stButton"] {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100% !important;
-        height: 130px !important;
-        z-index: 10;
-        opacity: 0 !important;
-    }
-    .button-anchor div[data-testid="stButton"] > button {
-        width: 100% !important;
-        height: 130px !important;
-        border: none !important;
-        background: transparent !important;
-        cursor: pointer !important;
-    }
+
 
     .pos-badge {
         background: #FF1801;
@@ -446,6 +452,18 @@ st.markdown(
         font-weight: 700;
         margin-right: 6px;
     }
+
+    /* ==================== PODIUM CARD HOVER GLOW (team color) ==================== */
+    .podium-card {
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
+    }
+    .podium-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 0 30px var(--glow-color, rgba(255,255,255,0.25));
+        border-color: var(--glow-color, rgba(255,255,255,0.25));
+    }
+
     </style>
     """,
     unsafe_allow_html=True
@@ -596,14 +614,8 @@ with row2_cols[0]:
     """, unsafe_allow_html=True)
 
 with row2_cols[1]:
-    st.markdown("""
-    <div class="interactive-wrapper button-anchor">
-        <div class="paddock-box" style="border-left: 4px solid #27F4D2; min-height: 130px; max-height: 130px;">
-            <span style="font-size: 1.05em; color: #27F4D2; font-weight: 600;">&#x1F52E; Generate Grid Prediction</span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    trigger_prediction = st.button("Generate Grid Prediction", key="gen_pred_btn", use_container_width=True)
+    trigger_prediction = st.button("\U0001F52E  Generate Grid Prediction", key="gen_pred_btn", use_container_width=True)
+
 
 with row2_cols[2]:
     ferrari_color = TEAM_COLORS.get("Ferrari", "#E8002D")
@@ -646,7 +658,7 @@ if trigger_prediction:
                 p2_logo_centered = get_base64_logo_html(p2_row['team'], p2_color, centered=True)
                 with podium_cols[0]:
                     st.markdown(f"""
-                    <div style="background: #181820; border-radius: 12px; border-top: 4px solid {p2_color}; padding: 25px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
+                    <div class="podium-card" style="background: #181820; border-radius: 12px; border-top: 4px solid {p2_color}; padding: 25px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); --glow-color: {p2_color};">
                         <div style="margin-bottom: 15px;"><span class='pos-badge' style='background:#C0C0C0; color:#111;'>P2</span></div>
                         <img src="{get_driver_image(p2_row['driver'])}" style="width: 150px; height: auto; aspect-ratio: 1/1; object-fit: contain; margin-bottom: 12px;" />
                         <h3 style="margin: 5px 0 2px 0; font-size: 1.4em; color: #FFF; font-weight: 500;">{p2_row['_name']}</h3>
@@ -660,7 +672,7 @@ if trigger_prediction:
                 p1_logo_centered = get_base64_logo_html(p1_row['team'], p1_color, centered=True)
                 with podium_cols[1]:
                     st.markdown(f"""
-                    <div style="background: #181820; border-radius: 12px; border-top: 4px solid {p1_color}; padding: 30px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 12px 30px rgba(0,0,0,0.45); border-left: 1px solid rgba(255,215,0,0.05); border-right: 1px solid rgba(255,215,0,0.05);">
+                    <div class="podium-card" style="background: #181820; border-radius: 12px; border-top: 4px solid {p1_color}; padding: 30px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 12px 30px rgba(0,0,0,0.45); border-left: 1px solid rgba(255,215,0,0.05); border-right: 1px solid rgba(255,215,0,0.05); --glow-color: {p1_color};">
                         <div style="margin-bottom: 15px;"><span class='pos-badge' style='background:#FFD700; color:#111; box-shadow: 0 0 10px rgba(255,215,0,0.25);'>WINNER</span></div>
                         <img src="{get_driver_image(p1_row['driver'])}" style="width: 175px; height: auto; aspect-ratio: 1/1; object-fit: contain; margin-bottom: 12px;" />
                         <h2 style="margin: 5px 0 2px 0; font-size: 1.7em; color: #FFF; font-weight: bold; letter-spacing: 0.5px;">{p1_row['_name']}</h2>
@@ -674,7 +686,7 @@ if trigger_prediction:
                 p3_logo_centered = get_base64_logo_html(p3_row['team'], p3_color, centered=True)
                 with podium_cols[2]:
                     st.markdown(f"""
-                    <div style="background: #181820; border-radius: 12px; border-top: 4px solid {p3_color}; padding: 25px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
+                    <div class="podium-card" style="background: #181820; border-radius: 12px; border-top: 4px solid {p3_color}; padding: 25px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); --glow-color: {p3_color};">
                         <div style="margin-bottom: 15px;"><span class='pos-badge' style='background:#CD7F32; color:#111;'>P3</span></div>
                         <img src="{get_driver_image(p3_row['driver'])}" style="width: 140px; height: auto; aspect-ratio: 1/1; object-fit: contain; margin-bottom: 12px;" />
                         <h3 style="margin: 5px 0 2px 0; font-size: 1.3em; color: #FFF; font-weight: 500;">{p3_row['_name']}</h3>
