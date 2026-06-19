@@ -457,28 +457,45 @@ with row1_cols[0]:
         transform: translateY(-4px) scale(1.03);
         filter: drop-shadow(0 12px 16px rgba(255, 24, 1, 0.25));
     }
-    .wcc-contender-card {
-    background: #181820;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    border-radius: 10px;
-    padding: 12px 16px 12px 20px; /* Logo nahi hai toh left se proper padding */
+    /* WCC Wrapper setup jo hover events handle karega */
+.wcc-wrapper-box {
+    position: relative !important;
+    width: 100%;
+    height: 115px; 
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    align-items: flex-end;
+}
+
+/* WCC Card styling jisme text center aligned rahega */
+.wcc-contender-card {
+    background: #181820 !important;
+    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    border-radius: 10px !important;
+    padding: 12px 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important; /* Poora content horizontally center */
+    text-align: center !important;
     width: 100%;
     height: 115px !important; 
     box-sizing: border-box;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    margin-bottom: 12px !important; /* Jaise Col 1 ko dhakka diya tha line pe lane ke liye */
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    margin-bottom: 12px !important; /* Grid alignment fix */
 }
 
+/* 🔥 Column 1 jaisa exact hover animation aur red glow dynamic effect */
 .wcc-wrapper-box:hover .wcc-contender-card {
-    border-color: #FF1801 !important;
-    box-shadow: 0 0 20px rgba(255, 24, 1, 0.35) !important;
+    transform: translateY(-4px) !important; /* Card halka sa upar uthega */
+    border-color: rgba(255, 24, 1, 0.4) !important; /* Red border focus */
     background: #1c1c26 !important;
+    box-shadow: 0 0 20px rgba(255, 24, 1, 0.35) !important; /* Red F1 neon glow */
 }
-    </style>
-    """, unsafe_allow_html=True)
+
+/* Logo scale up animation on hover */
+.wcc-wrapper-box:hover img {
+    transform: scale(1.08);
+}
 
     st.markdown(f"""
     <div class="wdc-wrapper-box">
@@ -510,37 +527,35 @@ with row1_cols[2]:
     """, unsafe_allow_html=True)
 
 with row1_cols[3]:
-    # WCC Leader defaults
     wcc_leader_team = "Mercedes" 
     wcc_accent_color = TEAM_COLORS.get(wcc_leader_team, "#27F4D2")
     
-    # Aapke code mein upar functions mein check karo, 'get_base64_logo_html' call use karenge
-    # Agar function setup centered ya border format mein hai, toh hum clean left-aligned use karenge:
     logo_path = "team_logos/mercedes.png"
     logo_html = ""
     
+    # Logo ka size badha kar height 32px kar di taaki clear aur bada dikhe
     if os.path.exists(logo_path):
         with open(logo_path, "rb") as img_file:
             b64_string = base64.b64encode(img_file.read()).decode()
-        logo_html = f'<img src="data:image/png;base64,{b64_string}" style="height: 24px; width: auto; margin-right: 12px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));" />'
+        logo_html = f'<img src="data:image/png;base64,{b64_string}" style="height: 32px; width: auto; margin-right: 10px; transition: transform 0.3s ease; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));" />'
     else:
-        # Fallback agar file na mile toh CDN se mercedes logo fetch karega
-        logo_html = '<img src="https://media.formula1.com/content/dam/fom-website/teams/2026/mercedes.png" style="height: 24px; width: auto; margin-right: 12px;" />'
+        logo_html = f'<img src="https://media.formula1.com/content/dam/fom-website/teams/2026/mercedes.png" style="height: 32px; width: auto; margin-right: 10px; transition: transform 0.3s ease;" />'
 
     st.markdown(f"""
     <div class="wcc-wrapper-box">
-        <div class="wcc-contender-card" style="border-left: 5px solid {wcc_accent_color}; text-align: left !important; display: flex; flex-direction: column; justify-content: center; height: 115px !important; box-sizing: border-box;">
-            <div style="color: #888888; font-size: 0.72em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; text-align: left !important;">WCC CONTENDER</div>
-            <div style="display: flex; align-items: center; margin-bottom: 4px;">
+        <div class="wcc-contender-card" style="border-left: 5px solid {wcc_accent_color};">
+            <div style="color: #888888; font-size: 0.72em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;">WCC CONTENDER</div>
+            <div style="display: inline-flex; align-items: center; justify-content: center; margin-bottom: 4px; width: 100%;">
                 {logo_html}
                 <span style="color: #FFFFFF; font-size: 1.25em; font-weight: bold;">{wcc_leader_team}</span>
             </div>
-            <div style="font-size: 0.85em; color: #BBBBBB; font-weight: 500; text-align: left !important;">Current Championship Leader</div>
+            <div style="font-size: 0.85em; color: #BBBBBB; font-weight: 500;">Current Championship Leader</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
-    with st.popover("Constructor Window"):
-        st.markdown("<h4 style='color:#FF1801;'>🏁 Constructors Championship Standings</h4>", unsafe_allow_html=True)
+    
+    # CRITICAL: Iske niche agar koi 'with st.popover(...):' ya baki lines bachi hain, unhe delete kar do.
+
         wcc_data = pd.DataFrame({"Pos": [1, 2, 3, 4, 5], "Team": ["Mercedes", "Ferrari", "McLaren", "Red Bull Racing", "Cadillac"], "Points": [262, 190, 141, 89, 0]})
         st.table(wcc_data.set_index("Pos"))
 
