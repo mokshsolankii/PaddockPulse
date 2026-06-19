@@ -216,20 +216,7 @@ st.markdown(
         box-shadow: 0 0 20px rgba(255, 24, 1, 0.35) !important;
     }
 
-    /* Native button styling inject for Row 2 Column 2 button wrapper */
-    div.prediction-container div[data-testid="stButton"] button {
-        background-color: transparent !important;
-        color: #27F4D2 !important;
-        border: 1px solid rgba(39, 244, 210, 0.4) !important;
-        font-weight: bold !important;
-        height: 50px !important;
-        transition: all 0.3s ease !important;
-    }
-    div.prediction-container div[data-testid="stButton"] button:hover {
-        background-color: #27F4D2 !important;
-        color: #111116 !important;
-        box-shadow: 0 0 15px rgba(39, 244, 210, 0.4) !important;
-    }
+    /* Prediction button overlay handled by .button-anchor rules below */
 
     /* ==================== UNIFIED SELECTBOX CARD (REALIGNED) ==================== */
     div[data-testid="stColumn"]:nth-of-type(2) div[data-testid="stSelectbox"] {
@@ -291,6 +278,23 @@ st.markdown(
         width: 100%;
     }
 
+    .button-anchor div[data-testid="stButton"] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100% !important;
+        height: 130px !important;
+        z-index: 10;
+        opacity: 0 !important;
+    }
+    .button-anchor div[data-testid="stButton"] > button {
+        width: 100% !important;
+        height: 130px !important;
+        border: none !important;
+        background: transparent !important;
+        cursor: pointer !important;
+    }
+
     .pos-badge {
         background: #FF1801;
         color: white;
@@ -318,7 +322,6 @@ st.markdown(
         height: 115px;
         display: flex;
         align-items: flex-end;
-        transform: translateY(-15px) !important;
     }
     .wdc-contender-card {
         background: #181820;
@@ -409,15 +412,16 @@ st.markdown(
         background: #181820;
         border: 1px solid rgba(255, 255, 255, 0.04);
         border-radius: 10px;
-        padding: 12px 16px;
+        padding: 14px 16px;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
         border-left: 4px solid #B6BABD;
-        min-height: 85px;
-        max-height: 85px;
+        min-height: 130px;
+        max-height: 130px;
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
         justify-content: center;
+        gap: 6px;
         transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .race-result-box:hover {
@@ -430,9 +434,12 @@ st.markdown(
         display: flex;
         align-items: center;
         justify-content: space-between;
-        font-size: 0.78em;
+        font-size: 0.82em;
         color: #DDDDDD;
-        line-height: 1.5;
+        line-height: 1.4;
+        padding: 4px 10px;
+        border-radius: 4px;
+        background: rgba(255,255,255,0.02);
     }
     .race-result-row .pos-tag {
         color: #888888;
@@ -525,10 +532,10 @@ with row1_cols[0]:
     st.markdown(f"""
     <div class="wdc-wrapper-box">
         <img class="wdc-3d-avatar" src="{driver_b64_stream}" />
-        <div class="wdc-contender-card">
+        <div class="wdc-contender-card" style="border-left: 6px solid {accent_color};">
             <div style="color: #888888; font-size: 0.72em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2;">WDC CONTENDER</div>
             <div style="color: #FFFFFF; font-size: 1.25em; font-weight: bold; margin: 3px 0; line-height: 1.2;">{leader_name}</div>
-            <div style="border-left: 3px solid {accent_color}; padding-left: 8px; font-size: 0.85em; color: #BBBBBB; font-weight: 500; margin-top: 3px; line-height: 1.2;">{leader_team}</div>
+            <div style="font-size: 0.85em; color: #BBBBBB; font-weight: 500; margin-top: 3px; line-height: 1.2;">{leader_team}</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -568,10 +575,10 @@ with row1_cols[3]:
     st.markdown(f"""
     <div class="wcc-wrapper-box">
         <div class="wcc-3d-logo">{logo_html}</div>
-        <div class="wcc-contender-card">
+        <div class="wcc-contender-card" style="border-left: 6px solid {wcc_accent_color};">
             <div style="color: #888888; font-size: 0.72em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2;">WCC CONTENDER</div>
             <div style="color: #FFFFFF; font-size: 1.25em; font-weight: bold; margin: 3px 0; line-height: 1.2;">{wcc_leader_team}</div>
-            <div style="border-left: 3px solid {wcc_accent_color}; padding-left: 8px; font-size: 0.85em; color: #BBBBBB; font-weight: 500; margin-top: 3px; line-height: 1.2;">Current Championship Leader</div>
+            <div style="font-size: 0.85em; color: #BBBBBB; font-weight: 500; margin-top: 3px; line-height: 1.2;">Current Championship Leader</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -582,24 +589,32 @@ row2_cols = st.columns(3)
 with row2_cols[0]:
     track_info = TRACK_METRICS.get(race_name, {"name": "F1 Grand Prix Track", "weather": "Fetching Live Status..."})
     st.markdown(f"""
-    <div class="paddock-box" style="border-left: 4px solid #64C4FF; align-items: center; text-align: center !important; min-height: 85px; max-height: 85px;">
+    <div class="paddock-box" style="border-left: 4px solid #64C4FF; align-items: center; text-align: center !important; min-height: 130px; max-height: 130px;">
         <span style='font-size: 1.1em; font-weight: 600; color: #FFF;'>Circuit details</span>
         <span style='color: #888888; font-size: 0.85em; margin-top: 3px;'>&#x1F5FA; {track_info['name']} &bull; {track_info['weather']}</span>
     </div>
     """, unsafe_allow_html=True)
 
 with row2_cols[1]:
-    st.markdown('<div class="prediction-container paddock-box" style="border-left: 4px solid #27F4D2; align-items: stretch; padding: 12px 14px; min-height: 85px; max-height: 85px;">', unsafe_allow_html=True)
-    trigger_prediction = st.button("Generate Grid Prediction", use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="interactive-wrapper button-anchor">
+        <div class="paddock-box" style="border-left: 4px solid #27F4D2; min-height: 130px; max-height: 130px;">
+            <span style="font-size: 1.05em; color: #27F4D2; font-weight: 600;">&#x1F52E; Generate Grid Prediction</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    trigger_prediction = st.button("Generate Grid Prediction", key="gen_pred_btn", use_container_width=True)
 
 with row2_cols[2]:
-    st.markdown("""
+    ferrari_color = TEAM_COLORS.get("Ferrari", "#E8002D")
+    mercedes_color = TEAM_COLORS.get("Mercedes", "#27F4D2")
+    mclaren_color = TEAM_COLORS.get("McLaren", "#FF8000")
+    st.markdown(f"""
     <div class="race-result-box">
-        <div style="color: #FFFFFF; font-size: 0.95em; font-weight: 600; margin-bottom: 6px;">Last race result</div>
-        <div class="race-result-row"><span><span class="pos-tag">P1</span>Lewis Hamilton</span><span style="color:#888;">Ferrari</span></div>
-        <div class="race-result-row"><span><span class="pos-tag">P2</span>George Russell</span><span style="color:#888;">Mercedes</span></div>
-        <div class="race-result-row"><span><span class="pos-tag">P3</span>Lando Norris</span><span style="color:#888;">McLaren</span></div>
+        <div style="color: #FFFFFF; font-size: 0.95em; font-weight: 600; margin-bottom: 4px;">Last race result</div>
+        <div class="race-result-row" style="border-left: 3px solid {ferrari_color};"><span><span class="pos-tag">P1</span>Lewis Hamilton</span><span style="color:#888;">Ferrari</span></div>
+        <div class="race-result-row" style="border-left: 3px solid {mercedes_color};"><span><span class="pos-tag">P2</span>George Russell</span><span style="color:#888;">Mercedes</span></div>
+        <div class="race-result-row" style="border-left: 3px solid {mclaren_color};"><span><span class="pos-tag">P3</span>Lando Norris</span><span style="color:#888;">McLaren</span></div>
     </div>
     """, unsafe_allow_html=True)
 
